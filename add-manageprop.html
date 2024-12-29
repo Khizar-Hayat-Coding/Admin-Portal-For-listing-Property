@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add and Manage Properties</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <nav class="navbar">
+        <ul>
+            <li><a href="dashboard.html">Dashboard</a></li>
+            <li><a href="add-manageprop.html">Add-Manage Property</a></li>
+            <li><a href="logout.html">Logout</a></li>
+        </ul>
+    </nav>
+
+    <div class="container">
+        <h2>Add Property</h2>
+        <form id="addPropertyForm">
+            <label for="propertyName">Property Name:</label>
+            <input type="text" id="propertyName" name="propertyName" required>
+
+            <label for="location">Location:</label>
+            <select id="location" name="location">
+                <option value="Gulshan-e-iqbal">Gulsan-e-Iqbal</option>
+                <option value="Clifton">Clifton</option>
+                <option value="Nazimabad">Nazimabad</option>
+
+            </select>
+
+            <label for="type">Property Type:</label>
+            <input type="radio" id="hostel" name="type" value="Hostel"> Hostel
+            <input type="radio" id="flat" name="type" value="Flat"> Flat
+
+            <label for="price">Price:</label>
+            <input type="number" id="price" name="price" required>
+
+            <label for="description">Property Description:</label>
+            <textarea id="description" name="description" required></textarea>
+
+            <label for="images">Upload Images:</label>
+            <input type="file" id="images" name="images" multiple>
+
+            <button type="submit">Add Property</button>
+        </form>
+    </div>
+
+    <div class="container">
+        <h2>Manage Properties</h2>
+        <table id="propertyTable">
+            <thead>
+                <tr>
+                    <th>Property Name</th>
+                    <th>Location</th>
+                    <th>Type</th>
+                    <th>Price</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="propertyTableBody">
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        document.getElementById('addPropertyForm').addEventListener('submit', function(e) {
+            e.preventDefault(); 
+
+            const propertyName = document.getElementById('propertyName').value;
+            const location = document.getElementById('location').value;
+            const type = document.querySelector('input[name="type"]:checked')?.value;  
+            const price = document.getElementById('price').value;
+            const description = document.getElementById('description').value;
+
+            if (!propertyName || !location || !type || !price || !description) {
+                alert('Please fill all fields.');
+                return;
+            }
+
+            const newProperty = {
+                propertyName,
+                location,
+                type,
+                price,
+                description
+            };
+
+            let properties = JSON.parse(localStorage.getItem('properties')) || [];
+
+            properties.push(newProperty);
+
+            localStorage.setItem('properties', JSON.stringify(properties));
+
+            displayProperties();
+
+            document.getElementById('addPropertyForm').reset();
+        });
+
+        function displayProperties() {
+            const properties = JSON.parse(localStorage.getItem('properties')) || [];
+
+            const propertyTableBody = document.getElementById('propertyTableBody');
+
+            propertyTableBody.innerHTML = '';
+
+            properties.forEach(function(property) {
+                const row = propertyTableBody.insertRow();
+
+                row.insertCell(0).textContent = property.propertyName;
+                row.insertCell(1).textContent = property.location;
+                row.insertCell(2).textContent = property.type;
+                row.insertCell(3).textContent = property.price;
+
+                const actionsCell = row.insertCell(4);
+                const deleteButton = document.createElement('button');
+                deleteButton.textContent = 'Delete';
+                deleteButton.onclick = function() { deleteProperty(property); };
+
+                actionsCell.appendChild(deleteButton);
+            });
+        }
+
+        function deleteProperty(property) {
+            let properties = JSON.parse(localStorage.getItem('properties')) || [];
+
+            properties = properties.filter(p => p.propertyName !== property.propertyName);
+
+            localStorage.setItem('properties', JSON.stringify(properties));
+
+            displayProperties();
+        }
+
+        displayProperties();
+    </script>
+</body>
+</html>
